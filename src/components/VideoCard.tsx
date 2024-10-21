@@ -4,7 +4,7 @@ import { Download, Clock, FileDown, FileUp } from "lucide-react";
 import dayjs from 'dayjs';
 import realtiveTime from "dayjs/plugin/relativeTime"
 import { filesize } from "filesize"
-import { Video } from '@/types'; 
+import { Video } from '@/types';
 import Image from 'next/image';
 
 dayjs.extend(realtiveTime)
@@ -86,16 +86,20 @@ const VideoCard: React.FC<VideoCardProps> = ({ video, onDownload }) => {
                         </div>
                     ) : (
                         <video
+                            onClick={() =>
+                                onDownload(getFullVideoUrl(video.publicId), video.title)
+                            }
                             src={getPreviewVideoUrl(video.publicId)}
                             autoPlay
-                            muted
                             loop
-                            className="w-full h-full object-cover"
+                            className="w-full h-full object-cover cursor-pointer position-center"
                             onError={handlePreviewError}
                         />
                     )
                 ) : (
                     <Image
+                        width={400}
+                        height={225}
                         src={getThumbnailUrl(video.publicId)}
                         alt={video.title}
                         className="w-full h-full object-cover"
