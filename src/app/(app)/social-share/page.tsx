@@ -30,59 +30,48 @@ export default function SocialShare() {
     const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
         if (!file) return;
-
         setIsUploading(true);
         const formData = new FormData();
+        formData.append("file", file);
 
         try {
-            const response = await fetch('/api/image-upload', {
-                method: 'POST',
+            const response = await fetch("/api/image-upload", {
+                method: "POST",
                 body: formData
             })
 
-            if (!response.ok) {
-                throw new Error('Failed to upload image');
-            }
+            if (!response.ok) throw new Error("Failed to upload image");
 
             const data = await response.json();
             setUploadedImage(data.publicId);
         } catch (error) {
-            console.log(error);
-            alert('Failed to upload image');
+            console.log(error)
+            alert("Failed to upload image");
         } finally {
             setIsUploading(false);
         }
-    }
+    };
 
-    const handlDownload = () => {
+    const handleDownload = () => {
         if (!imageRef.current) return;
 
-        // Get the image blob
         fetch(imageRef.current.src)
             .then((response) => response.blob())
             .then((blob) => {
-                // Create a URL for the blob
                 const url = window.URL.createObjectURL(blob);
-                // Create a link element
-                const link = document.createElement('a');
-                // Set the link href to the URL
+                const link = document.createElement("a");
                 link.href = url;
-                // Set the link download attribute to the image file name
                 link.download = `${selectedFormat
                     .replace(/\s+/g, "_")
                     .toLowerCase()}.png`;
-                // Append the link to the
                 document.body.appendChild(link);
-                // Click the link
                 link.click();
-                // Remove the link
                 document.body.removeChild(link);
-                // Revoke the URL
                 window.URL.revokeObjectURL(url);
-                // Remove the link
-                document.body.removeChild(link);
             })
-
+            .catch((error) => {
+                console.error("Download failed:", error);
+            });
     }
 
     return (
@@ -151,7 +140,7 @@ export default function SocialShare() {
                                     </div>
 
                                     <div className="card-actions justify-end mt-6">
-                                        <button className="btn btn-primary" onClick={handlDownload}>Dowload for {selectedFormat}</button>
+                                        <button className="btn btn-primary" onClick={handleDownload}>Dowload for {selectedFormat}</button>
                                     </div>
                                 </div>
                             )}
