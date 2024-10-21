@@ -13,6 +13,7 @@ cloudinary.config({
     api_secret: process.env.CLOUDINARY_API_SECRET // Click 'View Credentials' below to copy your API secret
 });
 
+// Interface for the Cloudinary upload result
 interface CloudinaryUploadResult {
     public_id: string;
     bytes: number;
@@ -32,7 +33,9 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: "Cloudinary credentials not found" }, { status: 500 })
         }
 
+        // Parse the incoming form data
         const formData = await request.formData();
+        // Get the file from the form data
         const file = formData.get("file") as File | null;
         const title = formData.get("title") as string;
         const description = formData.get("description") as string;
@@ -42,13 +45,18 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: "File not found" }, { status: 400 })
         }
 
+        // Convert the file to a buffer
         const bytes = await file.arrayBuffer()
+        // Create a buffer from the bytes
         const buffer = Buffer.from(bytes)
 
+        // Upload the image to Cloud
         const result = await new Promise<CloudinaryUploadResult>(
             (resolve, reject) => {
+                // Create a stream to upload the image
                 const uploadStream = cloudinary.uploader.upload_stream(
                     {
+                        // Upload options
                         resource_type: "video",
                         folder: "video-uploads",
                         transformation: [
@@ -60,9 +68,11 @@ export async function POST(request: NextRequest) {
                         else resolve(result as CloudinaryUploadResult);
                     }
                 )
+                // Write the buffer to the stream
                 uploadStream.end(buffer)
             }
         )
+        // Save the video to the database
         const video = await prisma.video.create({
             data: {
                 title,
@@ -73,11 +83,13 @@ export async function POST(request: NextRequest) {
                 duration: result.duration || 0,
             }
         })
+        // Return the video
         return NextResponse.json(video)
     } catch (error) {
         console.log("UPload video failed", error)
         return NextResponse.json({ error: "UPload video failed" }, { status: 500 })
     } finally {
+        // Disconnect the Prisma client
         await prisma.$disconnect()
     }
 }
