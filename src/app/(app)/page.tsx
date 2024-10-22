@@ -3,11 +3,12 @@
 import React, { useState, useEffect, useCallback } from 'react'
 import axios from 'axios'
 import VideoCard from '@/components/VideoCard'
-import { Video } from '@/types'
+import { Video } from '@/types/index'
 
 export default function Home() {
     const [videos, setVideos] = useState<Video[]>([])
     const [loading, setLoading] = useState(true)
+    // eslint-disable-next-line
     const [error, setError] = useState<string | null>(null)
 
     const fetchVideos = useCallback(async () => {
