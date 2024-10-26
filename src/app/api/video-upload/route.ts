@@ -53,7 +53,7 @@ export async function POST(request: NextRequest) {
         // Upload the image to Cloud
         const result = await new Promise<CloudinaryUploadResult>(
             (resolve, reject) => {
-                // Create a stream to upload the image
+                // Create a stream to upload the video
                 const uploadStream = cloudinary.uploader.upload_stream(
                     {
                         // Upload options
